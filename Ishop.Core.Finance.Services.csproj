@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Gokhan.Core.Entity\Gokhan.Core.Entity.csproj" />
+    <ProjectReference Include="..\Ishop.Core.Finance.Entity\Ishop.Core.Finance.Entity.csproj" />
+    <ProjectReference Include="..\Ishop.Core.Finance.Data\Ishop.Core.Finance.Data.csproj" />
+    <ProjectReference Include="..\Gokhan.Core.DependencyResolver\Gokhan.Core.DependencyResolver.csproj" />
+    <ProjectReference Include="..\Gokhan.Core.Services\Gokhan.Core.Services.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.2" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />   
+  </ItemGroup>
+</Project>
