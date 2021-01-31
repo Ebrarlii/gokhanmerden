@@ -6,6 +6,6 @@ using Ishop.Core.Finance.Entity;
 namespace Ishop.Core.Finance.Services
 {
     public interface IVoucherServices {
-        Task<IEnumerable<VoucherEntity>> getVouchers(int YearNo,int MonthNo,int UnitNo); 
+        Task<IEnumerable<VoucherEntity>> getVouchers(int YearNo,byte MonthNo,int UnitNo); 
     } 
 }
