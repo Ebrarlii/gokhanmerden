@@ -19,12 +19,9 @@ namespace Ishop.Core.Finance.Services
             _mapper =Gokhan.Core.Services.MappingConfiguration.CreateMapping(typeof(VoucherServices));
 
         } 
-        public async Task<IEnumerable<VoucherExpensesEntity>> getVouchers(int YearNo, byte MonthNo, int UnitNo)
+        public async Task<Gokhan.Core.Services.PaginatedList<VoucherExpensesEntity>> getVouchers(int YearNo, byte MonthNo, int UnitNo)
         {
             var argument = Expression.Parameter(typeof(Voucher));
-            //var queryYear = Expression.Property(argument,"yearNo");
-            //var queryMonth = Expression.Property(argument,"monthNo");
-            //var queryUnit = Expression.Property(argument,"unitNo");
             IQueryable<Voucher> voucherQueryable = _financeUnitOfWork.VoucherRepository.GetManyQueryable();
             IQueryable<PaymentSummary> paymentSummaryQueryable = _financeUnitOfWork.PaymentSummaryRepository.GetManyQueryable();
             FinanceDbContext context = _financeUnitOfWork.GetContext();
@@ -109,10 +106,10 @@ namespace Ishop.Core.Finance.Services
                                 // ISNULL(PS.CREDIT_AMOUNT, 0) AS CreditAmount, ISNULL(PS.BALANCE, 0) AS Balance
 
             var voucherList =  await _financeUnitOfWork.GetQueryableToList(result);
-
+            var paginatedList = new Gokhan.Core.Services.PaginatedList<VoucherExpensesEntity>(voucherList,voucherList.Count,1,50);
             //var viewModel = _mapper.Map<IEnumerable<Voucher>,IEnumerable<VoucherEntity>>(voucherList);
 
-            return voucherList;       
+            return paginatedList;       
         }
     }
 }
