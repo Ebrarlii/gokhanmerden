@@ -19,7 +19,7 @@ namespace Ishop.Core.Finance.Services
             _mapper =Gokhan.Core.Services.MappingConfiguration.CreateMapping(typeof(VoucherServices));
 
         } 
-        public async Task<IEnumerable<VoucherEntity>> getVouchers(int YearNo, byte MonthNo, int UnitNo)
+        public async Task<IEnumerable<VoucherExpensesEntity>> getVouchers(int YearNo, byte MonthNo, int UnitNo)
         {
             var argument = Expression.Parameter(typeof(Voucher));
             //var queryYear = Expression.Property(argument,"yearNo");
@@ -51,7 +51,7 @@ namespace Ishop.Core.Finance.Services
             voucherTypesInVoucherTable.Add(10);
             voucherTypesInVoucherTable.Add(11);
             voucherTypesInVoucherTable.Add(16);
-            var result =    from    table in voucherQueryable
+            IQueryable<VoucherExpensesEntity> result =    from    table in voucherQueryable
                             join paySum in context.PaymentSummary on table.voucherNo equals paySum.voucherNo into paySumInto
                             from paySum in paySumInto.DefaultIfEmpty()
                             join resTreeU1 in context.ResourceTree on table.unitNo equals resTreeU1.id into resTreeU1Into
@@ -69,17 +69,50 @@ namespace Ishop.Core.Finance.Services
                                                 new { voucherNo = table.voucherNo, voucherTypes = voucherTypes.Contains(table.voucherType)}
                                          equals new { voucherNo = paymentVoucher.voucherNo, voucherTypes = true} into paymentVoucherInto
                             from paymentVoucher in paymentVoucherInto.DefaultIfEmpty()
+                            join firma in context.Firma on paymentVoucher.companyNo equals firma.id into firmaInto
+                            from firma in firmaInto.DefaultIfEmpty()
                             where   table.account.debitOrCredit == "C" &&
                                     table.rowNo == 0 &&
                                     context.getResourceTreeChilds(UnitNo,1,3,true).Select(p=>p.ITEM_ID).Contains(table.unitNo) &&
                                     voucherTypesInVoucherTable.Contains(table.voucherType)
-                            select table;
-                            
-            var voucherList =  await _financeUnitOfWork.VoucherRepository.GetQueryableToList(result);
+                            select( new VoucherExpensesEntity() { voucherNo = table.voucherNo, rowNo = table.rowNo, rowDate = table.rowDate,
+                                         yearNo = table.yearNo, monthNo = table.monthNo,unitNo = table.unitNo, 
+                                         voucherStatus = table.voucherStatus,voucherType = table.voucherType,accountNo = table.accountNo,
+                                         prodOrCancel = table.prodOrCancel,isCancelled = table.isCancelled,
+                                         comments = table.comments,netAmount = table.netAmount,grossAmount = table.grossAmount,
+                                         kdvAmount = table.kdvAmount,kdvRate = table.kdvRate,typeName = voucherType.typeName,
+                                         yearMonthNo = ((System.Convert.ToInt32(table.yearNo) * 100) + System.Convert.ToInt32(table.monthNo)),
+                                         InvoiceNoList = context.P300INVOICE_INVOICE_NO(table.voucherStatus),
+                                         InvoiceDateList = context.P300INVOICE_INVOICE_DATE(table.voucherNo),
+                                         dmisFisNo = table.dmisFisNo,dmisNetTutar = table.dmisNetTutar,localeStatusDate = table.localeStatusDate, 
+                                         localeStatusText = table.localeStatusText,
+                                         paymentDate = paymentVoucher.paymentDate,paymentNo = paymentVoucher.paymentNo,
+                                         DebtLedgerNoListBirim = context.P300DEBT_LEDGER_NO_LIST(table.voucherNo, 2),
+                                         DebtLedgerNoList = context.P300DEBT_LEDGER_NO_LIST(table.voucherNo, 1),
+                                         DebtLedgerSendDateListBirim = context.P300DEBT_LEDGER_SEND_DATE_LIST(table.voucherNo, 2),
+                                         DebtLedgerSendDateList = context.P300DEBT_LEDGER_SEND_DATE_LIST(table.voucherNo, 1),
+                                         accountCode = table.account.accountCode,accountName = table.account.accountName, 
+                                         fieldName = monthF.fieldName,fieldNo = monthF.fieldNo,
+                                         MainUnitName = resTreeU3.text, UnitName = resTreeU11.text, RelatedUnitName = resTreeU2.text,
+                                         accrumentNo = paymentVoucher.accrumentNo,accrumentDate = paymentVoucher.accrumentDate, 
+                                         TenderConfirmDate = paymentVoucher.TenderConfirmDate,
+                                         TenderConfirmNo = paymentVoucher.TenderConfirmNo,tenderDate = paymentVoucher.tenderDate, 
+                                         TenderMethodName = paymentVoucher.TenderMethodName,
+                                         TenderMethodNo = paymentVoucher.TenderMethodNo,companyNo = paymentVoucher.companyNo, 
+                                         firmaAd = firma.firmaAd,debitAmount = paySum.debitAmount,
+                                         creditAmount = paySum.creditAmount,balance = paySum.balance } );
+                            // CASE VO.VOUCHER_STATUS 
+                                //WHEN 0 THEN '�ptal' 
+                                //WHEN 1 THEN 'Tahakkuk Onaylama' 
+                                //WHEN 2 THEN '�deme ��lemleri' WHEN 3 
+                                //THEN '�demeler' ELSE CONVERT(NVARCHAR, VO.VOUCHER_STATUS) END AS VoucherStatusTitle, 
+                                // ISNULL(PS.CREDIT_AMOUNT, 0) AS CreditAmount, ISNULL(PS.BALANCE, 0) AS Balance
 
-            var viewModel = _mapper.Map<IEnumerable<Voucher>,IEnumerable<VoucherEntity>>(voucherList);
+            var voucherList =  await _financeUnitOfWork.GetQueryableToList(result);
 
-            return viewModel;       
+            //var viewModel = _mapper.Map<IEnumerable<Voucher>,IEnumerable<VoucherEntity>>(voucherList);
+
+            return voucherList;       
         }
     }
 }
