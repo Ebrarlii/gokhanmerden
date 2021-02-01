@@ -8,6 +8,7 @@ namespace Ishop.Core.Finance.Services
     {
         public MapperProfile() {
             this.CreateMap<Voucher, VoucherEntity>().ReverseMap();
+            this.CreateMap<MaturityEntry, MaturityEntryEntity>().ReverseMap();
         } 
     } 
 }

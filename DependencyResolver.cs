@@ -17,7 +17,7 @@ namespace Ishop.Core.Finance.Services
             service.AddScoped<IKullaniciKurumRolServices,KullaniciKurumRolServices>(s=> new KullaniciKurumRolServices(financeAppSettings));
             service.AddScoped<IResourceTreeServices,ResourceTreeServices>(s=> new ResourceTreeServices(config,financeAppSettings));
             service.AddScoped<IVoucherServices,VoucherServices>(s=> new VoucherServices(config));
-        
+            service.AddScoped<IBaseEntryServices<MaturityEntryEntity>,MaturityEntryServices>(s=> new MaturityEntryServices(config));
         }
     }
 }
