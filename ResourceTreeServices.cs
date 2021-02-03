@@ -25,11 +25,11 @@ namespace Ishop.Core.Finance.Services
         {
             List<KullaniciKurumRolAtamaEntity> _kullaniciKurumRols = await _kullaniciKurumServices.getByPersonelId(personelId);
             List<int> _kaynakList = _kullaniciKurumRols.Select(p=> p.kurum.KurumsalKaynakItemID).ToList();
-            List<int> _atamaListId = _kullaniciKurumRols.Select(p=> p.KurumID).ToList();
+            //List<int> _atamaListId = _kullaniciKurumRols.Select(p=> p.KurumID).ToList();
             IEnumerable<ResourceTreeEntity> _resourceTrees = 
             await _financeUnitOfWork.ResourceTreeRepository
             .GetListAsync<ResourceTreeEntity>(selector: s=> new ResourceTreeEntity(s.id,s.text),
-                                        predicate: p=> (_kaynakList.Contains(p.id) || _atamaListId.Contains(p.objectId)) && p.isDeleted != true,orderBy: o=> o.OrderBy(ob=> ob.text));
+                                        predicate: p=> _kaynakList.Contains(p.id) && p.isDeleted != true,orderBy: o=> o.OrderBy(ob=> ob.text));
             
             return _resourceTrees;
         }
