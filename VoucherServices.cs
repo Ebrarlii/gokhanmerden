@@ -66,7 +66,7 @@ namespace Ishop.Core.Finance.Services
                                                 new { voucherNo = table.voucherNo, voucherTypes = voucherTypes.Contains(table.voucherType)}
                                          equals new { voucherNo = paymentVoucher.voucherNo, voucherTypes = true} into paymentVoucherInto
                             from paymentVoucher in paymentVoucherInto.DefaultIfEmpty()
-                            join firma in context.Firma on paymentVoucher.companyNo equals firma.id into firmaInto
+                            join firma in context.Company on paymentVoucher.companyNo equals firma.id into firmaInto
                             from firma in firmaInto.DefaultIfEmpty()
                             where   table.account.debitOrCredit == "C" &&
                                     table.rowNo == 0 &&
