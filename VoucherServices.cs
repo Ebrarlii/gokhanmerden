@@ -71,6 +71,7 @@ namespace Ishop.Core.Finance.Services
                                      select maturity.voucherNo).Contains(table.voucherNo) : true) &&
                                     table.account.debitOrCredit == "C" &&
                                     table.rowNo == 0 &&
+                                    firma.id == model.companyId &&
                                     context.getResourceTreeChilds(model.unitNo,1,3,true).Select(p=>p.ITEM_ID).Contains(table.unitNo) &&
                                     voucherTypesInVoucherTable.Contains(table.voucherType)
                             select( new VoucherExpensesEntity() { voucherNo = table.voucherNo, rowNo = table.rowNo, rowDate = table.rowDate,
