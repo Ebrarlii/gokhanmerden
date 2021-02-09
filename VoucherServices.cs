@@ -19,24 +19,21 @@ namespace Ishop.Core.Finance.Services
             _mapper =Gokhan.Core.Services.MappingConfiguration.CreateMapping(typeof(VoucherServices));
 
         } 
-        public async Task<Gokhan.Core.Services.PaginatedList<VoucherExpensesEntity>> getVouchers(int YearNo, byte MonthNo, int UnitNo)
+        public async Task<Gokhan.Core.Services.PaginatedList<VoucherExpensesEntity>> getVouchers(VoucherPostRequestModel model)
         {
             var argument = Expression.Parameter(typeof(Voucher));
             IQueryable<Voucher> voucherQueryable = _financeUnitOfWork.VoucherRepository.GetManyQueryable();
             IQueryable<PaymentSummary> paymentSummaryQueryable = _financeUnitOfWork.PaymentSummaryRepository.GetManyQueryable();
             FinanceDbContext context = _financeUnitOfWork.GetContext();
-            //Expression<Func<Voucher, bool>> query = null;
-            if (YearNo > 0) {
-                //var expressYear = Expression.Lambda<Func<Voucher, bool>>(Expression.Equal(queryYear,Expression.Constant(YearNo)), new[] {argument});
-                voucherQueryable = voucherQueryable.Where(p=>p.yearNo == YearNo);
+
+            voucherQueryable = voucherQueryable.Where(p=>p.yearNo >= model.startDate.Year && p.yearNo <= model.endDate.Year);
                 
+            voucherQueryable = voucherQueryable.Where(p=>p.monthNo >= model.startDate.Month && p.monthNo <= model.endDate.Month);
+
+            if (model.unitNo > 0 ) {
+                voucherQueryable = voucherQueryable.Where(p=> p.unitNo == model.unitNo);
             }
-            if (MonthNo > 0) {
-                voucherQueryable = voucherQueryable.Where(p=>p.monthNo == MonthNo);
-            }
-            if (UnitNo > 0 ) {
-                voucherQueryable = voucherQueryable.Where(p=> p.unitNo == UnitNo);
-            }
+
             List<int> voucherTypes = new List<int>();
             voucherTypes.Add(3);
             voucherTypes.Add(4);
@@ -70,7 +67,7 @@ namespace Ishop.Core.Finance.Services
                             from firma in firmaInto.DefaultIfEmpty()
                             where   table.account.debitOrCredit == "C" &&
                                     table.rowNo == 0 &&
-                                    context.getResourceTreeChilds(UnitNo,1,3,true).Select(p=>p.ITEM_ID).Contains(table.unitNo) &&
+                                    context.getResourceTreeChilds(model.unitNo,1,3,true).Select(p=>p.ITEM_ID).Contains(table.unitNo) &&
                                     voucherTypesInVoucherTable.Contains(table.voucherType)
                             select( new VoucherExpensesEntity() { voucherNo = table.voucherNo, rowNo = table.rowNo, rowDate = table.rowDate,
                                          yearNo = table.yearNo, monthNo = table.monthNo,unitNo = table.unitNo, 
@@ -98,12 +95,6 @@ namespace Ishop.Core.Finance.Services
                                          TenderMethodNo = paymentVoucher.TenderMethodNo,companyNo = paymentVoucher.companyNo, 
                                          firmaAd = firma.firmaAd,debitAmount = paySum.debitAmount,
                                          creditAmount = paySum.creditAmount,balance = paySum.balance } );
-                            // CASE VO.VOUCHER_STATUS 
-                                //WHEN 0 THEN '�ptal' 
-                                //WHEN 1 THEN 'Tahakkuk Onaylama' 
-                                //WHEN 2 THEN '�deme ��lemleri' WHEN 3 
-                                //THEN '�demeler' ELSE CONVERT(NVARCHAR, VO.VOUCHER_STATUS) END AS VoucherStatusTitle, 
-                                // ISNULL(PS.CREDIT_AMOUNT, 0) AS CreditAmount, ISNULL(PS.BALANCE, 0) AS Balance
 
             var voucherList =  await _financeUnitOfWork.GetQueryableToList(result);
             var paginatedList = new Gokhan.Core.Services.PaginatedList<VoucherExpensesEntity>(voucherList,voucherList.Count,1,50);
