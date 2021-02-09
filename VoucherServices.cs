@@ -45,6 +45,8 @@ namespace Ishop.Core.Finance.Services
             voucherTypesInVoucherTable.Add(10);
             voucherTypesInVoucherTable.Add(11);
             voucherTypesInVoucherTable.Add(16);
+            /* _financeUnitOfWork.MaturityEntryRepository.GetListAsync<List<int>>( selector: s=> s.voucherNo, 
+                                                                                predicate: p=> p.) */
             IQueryable<VoucherExpensesEntity> result =    from    table in voucherQueryable
                             join paySum in context.PaymentSummary on table.voucherNo equals paySum.voucherNo into paySumInto
                             from paySum in paySumInto.DefaultIfEmpty()
@@ -65,7 +67,9 @@ namespace Ishop.Core.Finance.Services
                             from paymentVoucher in paymentVoucherInto.DefaultIfEmpty()
                             join firma in context.Company on paymentVoucher.companyNo equals firma.id into firmaInto
                             from firma in firmaInto.DefaultIfEmpty()
-                            where   table.account.debitOrCredit == "C" &&
+                            where   ( model.onlyNotDues == true ? !(from maturity in context.MaturityEntry
+                                     select maturity.voucherNo).Contains(table.voucherNo) : true) &&
+                                    table.account.debitOrCredit == "C" &&
                                     table.rowNo == 0 &&
                                     context.getResourceTreeChilds(model.unitNo,1,3,true).Select(p=>p.ITEM_ID).Contains(table.unitNo) &&
                                     voucherTypesInVoucherTable.Contains(table.voucherType)
