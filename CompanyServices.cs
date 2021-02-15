@@ -46,7 +46,7 @@ namespace Ishop.Core.Finance.Services
 
         public async Task<PaginatedList<CompanyEntity>> getCompanies(CompanyRequestModel model)
         {
-           IEnumerable<CompanyEntity> result = await _financeUnitOfWork.CompanyRepository.GetListAsync<CompanyEntity>(selector: s=> new CompanyEntity(s.id,s.firmaNo,s.firmaAd,s.vergiNo),predicate: p=> (p.firmaAd.Contains(model.name) || p.vergiNo.Contains(model.vergiNo)) && p.isDeleted != true);
+           IEnumerable<CompanyEntity> result = await _financeUnitOfWork.CompanyRepository.GetListAsync<CompanyEntity>(selector: s=> new CompanyEntity(s.id,s.firmaNo,s.firmaAd,s.vergiNo),predicate: p=> (p.firmaAd.Contains(model.name) || p.vergiNo.Contains(model.name)) && p.isDeleted != true);
            
            return new PaginatedList<CompanyEntity>(result.Take(10),10,1,50);
         }
