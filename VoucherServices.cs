@@ -23,7 +23,7 @@ namespace Ishop.Core.Finance.Services
         {
             var argument = Expression.Parameter(typeof(Voucher));
             IQueryable<Voucher> voucherQueryable = _financeUnitOfWork.VoucherRepository.GetManyQueryable();
-            IQueryable<PaymentSummary> paymentSummaryQueryable = _financeUnitOfWork.PaymentSummaryRepository.GetManyQueryable();
+            // IQueryable<PaymentSummary> paymentSummaryQueryable = _financeUnitOfWork.PaymentSummaryRepository.GetManyQueryable();
             FinanceDbContext context = _financeUnitOfWork.GetContext();
 
             voucherQueryable = voucherQueryable.Where(p=>p.yearNo >= model.startDate.Year && p.yearNo <= model.endDate.Year);
