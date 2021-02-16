@@ -20,6 +20,7 @@ namespace Ishop.Core.Finance.Services
             service.AddScoped<IBaseEntryServices<MaturityEntryEntity>,MaturityEntryServices>(s=> new MaturityEntryServices(config));
             service.AddScoped<ICompanyServices,CompanyServices>(s=> new CompanyServices(config, financeAppSettings));
             service.AddScoped<IMaturityEntryReportServices,MaturityEntryReportServices>(s=> new MaturityEntryReportServices(config));
+            service.AddScoped<IMaturityEntryServices, MaturityEntryServices>(s=> new MaturityEntryServices(config));
         }
     }
 }
