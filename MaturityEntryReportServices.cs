@@ -48,7 +48,7 @@ namespace Ishop.Core.Finance.Services
                                 giderTuru = paymentVoucher.accountName,
                                 odenecekTutar = table.dmisNetTutar
                             } );
-            System.Console.WriteLine(result.ToQueryString());
+            //System.Console.WriteLine(result.ToQueryString());
             var voucherList =  await _financeUnitOfWork.GetQueryableToList(result);
             var paginatedList = new Gokhan.Core.Services.PaginatedList<maturityEntryReportResultModel>(voucherList,voucherList.Count,1,50);
 
