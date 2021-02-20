@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Ishop.Core.Finance.Data;
 using Ishop.Core.Finance.Entity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 namespace Ishop.Core.Finance.Services
@@ -34,7 +35,8 @@ namespace Ishop.Core.Finance.Services
                             join firma in context.Company on paymentVoucher.companyNo equals firma.id into firmaInto
                             from firma in firmaInto.DefaultIfEmpty()
                             where   paySum.balance > 0 &&
-                                    table.rowNo == 0
+                                    table.rowNo == 0 &&
+                                    table.isCancelled != false
                             select ( new maturityEntryReportResultModel(){
                                 vergiNo     = firma.vergiNo, 
                                 firmaAdi    = firma.firmaAd,
@@ -44,9 +46,9 @@ namespace Ishop.Core.Finance.Services
                                 vadeGunu = maturity.maturityDay,
                                 feragatDurumu = maturity.renunciationStatus,
                                 giderTuru = paymentVoucher.accountName,
-                                odenecekTutar = table.dmisNetTutar == null ? 0 : table.dmisNetTutar.Value
+                                odenecekTutar = table.dmisNetTutar
                             } );
-
+            System.Console.WriteLine(result.ToQueryString());
             var voucherList =  await _financeUnitOfWork.GetQueryableToList(result);
             var paginatedList = new Gokhan.Core.Services.PaginatedList<maturityEntryReportResultModel>(voucherList,voucherList.Count,1,50);
 
