@@ -36,7 +36,8 @@ namespace Ishop.Core.Finance.Services
                             from firma in firmaInto.DefaultIfEmpty()
                             where   paySum.balance > 0 &&
                                     table.rowNo == 0 &&
-                                    table.isCancelled != false
+                                    table.isCancelled != false &&
+                                    table.unitNo == model.unitNo
                             select ( new maturityEntryReportResultModel(){
                                 vergiNo     = firma.vergiNo, 
                                 firmaAdi    = firma.firmaAd,
