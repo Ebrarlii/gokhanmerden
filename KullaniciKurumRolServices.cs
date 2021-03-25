@@ -19,7 +19,7 @@ namespace Ishop.Core.Finance.Services
         
         public async Task<List<KullaniciKurumRolAtamaEntity>> getByPersonelId(int personelId)
         {
-            return await _kullaniciKurumRolWebRepository.get<KullaniciKurumRolAtamaEntity>(String.Format("KullaniciKurumRolAtama?query=PersonelID={0}&Page=-1&include=kurum", personelId));
+            return await _kullaniciKurumRolWebRepository.get<KullaniciKurumRolAtamaEntity>(String.Format("KullaniciKurumRolAtama?query=PersonelID={0}&Page=-1&include=kurum,rol", personelId));
         }
     }
 }

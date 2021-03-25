@@ -26,10 +26,18 @@ namespace Ishop.Core.Finance.Services
             List<KullaniciKurumRolAtamaEntity> _kullaniciKurumRols = await _kullaniciKurumServices.getByPersonelId(personelId);
             List<int> _kaynakList = _kullaniciKurumRols.Select(p=> p.kurum.KurumsalKaynakItemID).ToList();
             List<int> _atamaListId = _kullaniciKurumRols.Select(p=> p.KurumID).ToList();
-            IEnumerable<ResourceTreeEntity> _resourceTrees = 
-            await _financeUnitOfWork.ResourceTreeRepository
-            .GetListAsync<ResourceTreeEntity>(selector: s=> new ResourceTreeEntity(s.id,s.text),
+            IEnumerable<ResourceTreeEntity> _resourceTrees;
+            if (_kullaniciKurumRols.Where(predicate => predicate.rol.YoneticiMi == true).Count() > 0) {
+                _resourceTrees = await _financeUnitOfWork.ResourceTreeRepository
+                                        .GetListAsync<ResourceTreeEntity>(selector: s=> new ResourceTreeEntity(s.id,s.text),
+                                        predicate: p => p.isDeleted != true && p.organizationId == 3,orderBy: o=> o.OrderBy(ob=> ob.text));
+            } else {
+                _resourceTrees = await _financeUnitOfWork.ResourceTreeRepository
+                                        .GetListAsync<ResourceTreeEntity>(selector: s=> new ResourceTreeEntity(s.id,s.text),
                                         predicate: p=> (_kaynakList.Contains(p.id) || _atamaListId.Contains(p.objectId)) && p.isDeleted != true && p.organizationId == 3,orderBy: o=> o.OrderBy(ob=> ob.text));
+
+            }
+            
             
             return _resourceTrees;
         }
