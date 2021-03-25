@@ -30,7 +30,7 @@ namespace Ishop.Core.Finance.Services
             if (_kullaniciKurumRols.Where(predicate => predicate.rol.YoneticiMi == true).Count() > 0) {
                 _resourceTrees = await _financeUnitOfWork.ResourceTreeRepository
                                         .GetListAsync<ResourceTreeEntity>(selector: s=> new ResourceTreeEntity(s.id,s.text),
-                                        predicate: p => _kaynakList.Contains(p.id) && p.isDeleted != true && p.organizationId == 3,orderBy: o=> o.OrderBy(ob=> ob.text));
+                                        predicate: p =>  p.isDeleted != true && p.organizationId == 3 && p.enterpriseId == 1 && p.objectId > 0,orderBy: o=> o.OrderBy(ob=> ob.text));
             } else {
                 _resourceTrees = await _financeUnitOfWork.ResourceTreeRepository
                                         .GetListAsync<ResourceTreeEntity>(selector: s=> new ResourceTreeEntity(s.id,s.text),
