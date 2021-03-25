@@ -37,8 +37,6 @@ namespace Ishop.Core.Finance.Services
                                         predicate: p=> (_kaynakList.Contains(p.id) || _atamaListId.Contains(p.objectId)) && p.isDeleted != true && p.organizationId == 3,orderBy: o=> o.OrderBy(ob=> ob.text));
 
             }
-            
-            
             return _resourceTrees;
         }
 
