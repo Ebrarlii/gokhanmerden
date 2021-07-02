@@ -40,9 +40,10 @@ namespace Ishop.Core.Finance.Services
             return _resourceTrees;
         }
 
-        /*public async Task<List<KullaniciKurumRolAtamaEntity>> getByPersonelId(int personelId)
+        public List<int> GetResourceTreeParents(int ChildUnitID)
         {
-            return await _kullaniciKurumRolWebRepository.get<KullaniciKurumRolAtamaEntity>(String.Format("KullaniciKurumRolAtama?query=PersonelID={0}&Page=-1&include=kurum", personelId));
-        }*/
+           var result = this._financeUnitOfWork.GetResourceTreeParents(ChildUnitID);
+           return result;
+        }
     }
 }

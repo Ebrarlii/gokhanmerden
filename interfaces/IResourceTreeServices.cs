@@ -6,6 +6,7 @@ using Ishop.Core.Finance.Entity;
 namespace Ishop.Core.Finance.Services
 {
     public interface IResourceTreeServices{
-        public Task<IEnumerable<ResourceTreeEntity>> getByPersonelId(int personelId);
+        Task<IEnumerable<ResourceTreeEntity>> getByPersonelId(int personelId);
+        List<int> GetResourceTreeParents(int ChildUnitID);
     }
 }

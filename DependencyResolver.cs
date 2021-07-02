@@ -21,6 +21,8 @@ namespace Ishop.Core.Finance.Services
             service.AddScoped<ICompanyServices,CompanyServices>(s=> new CompanyServices(config, financeAppSettings));
             service.AddScoped<IMaturityEntryReportServices,MaturityEntryReportServices>(s=> new MaturityEntryReportServices(config));
             service.AddScoped<IMaturityEntryServices, MaturityEntryServices>(s=> new MaturityEntryServices(config));
+            service.AddScoped<It300donemServices, t300donemServices>(s=> new t300donemServices(config));
+            service.AddScoped<ISequencesServices, SequenceServices>(s=> new SequenceServices(config));   
         }
     }
 }
