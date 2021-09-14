@@ -34,7 +34,7 @@ namespace Ishop.Core.Finance.Services
             foreach(var model in modelList){
                 PaymentVoucher paymentVoucher = _financeUnitOfWork.PaymentVoucherRepository
                 .Get(p=>p.voucherNo == model.SystemVoucherNo);
-                Voucher voucher = _financeUnitOfWork.VoucherRepository.Get(p=> p.voucherNo == model.SystemVoucherNo);
+                Voucher voucher = _financeUnitOfWork.VoucherRepository.Get(p=> p.voucherNo == model.SystemVoucherNo && p.rowNo == 0);
                 PaymentSummary ps = _financeUnitOfWork.PaymentSummaryRepository.Get(p=> p.voucherNo == model.SystemVoucherNo);
             
                 var validateResult = ValidatePaymentConfirm(paymentVoucher,voucher,ps);
@@ -104,7 +104,7 @@ namespace Ishop.Core.Finance.Services
                     int confirmNo = 0;
                     if (int.TryParse(Convert.ToString(obj_system_voucher_no),out voucherNo)) {
                         if (int.TryParse(Convert.ToString(obj_confirm_no),out confirmNo)) {
-                            DateTime confirmDate = DateTime.FromOADate(Convert.ToDouble(obj_confirm_date));
+                            DateTime confirmDate = (DateTime)obj_confirm_date; //DateTime.FromOADate(Convert.ToDouble(obj_confirm_date));
                             ApproveAccrueRequestModel accrueModel = new ApproveAccrueRequestModel();
                             accrueModel.SystemVoucherNo = voucherNo;
                             accrueModel.ConfirmNo = confirmNo;

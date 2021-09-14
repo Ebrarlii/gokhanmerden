@@ -39,7 +39,7 @@ namespace Ishop.Core.Finance.Services
                 .Get(p=>p.voucherNo == requestModel.SystemVoucherNo);
                 Voucher voucher = _financeUnitOfWork.VoucherRepository.Get(p=>p.voucherNo == requestModel.SystemVoucherNo && p.rowNo == 0);
                 PaymentSummary paymentSummary = _financeUnitOfWork.PaymentSummaryRepository.Get(p=>p.voucherNo == requestModel.SystemVoucherNo);
-                var result = AccruementVoucherPaymentControl(paymentVoucher,requestModel.PaymentAmount,voucher,paymentSummary);
+                var result = AccruementVoucherPaymentControl(paymentVoucher,paymentSummary.debitAmount/*requestModel.PaymentAmount*/,voucher,paymentSummary);
                 if (!result) {
                     continue;
                 }
@@ -50,7 +50,7 @@ namespace Ishop.Core.Finance.Services
                 paymentVoucher.paymentVoucherNo = Convert.ToInt32(paymentVoucherNo);
                 paymentVoucher.paymentNo = requestModel.PaymentNo;
                 paymentVoucher.paymentDate = requestModel.PaymentDate;
-                paymentVoucher.paymentAmount = requestModel.PaymentAmount;
+                paymentVoucher.paymentAmount = paymentSummary.debitAmount; //requestModel.PaymentAmount;
                 paymentVoucher.accrumentStatus = AccruementStatus.Payment;
 
                 _financeUnitOfWork.PaymentVoucherRepository.Update(paymentVoucher);
@@ -69,7 +69,7 @@ namespace Ishop.Core.Finance.Services
                 voucherp.voucherStatus = VoucherStatus.Enabled;
                 voucherp.prodOrCancel = "O";
                 voucherp.isCancelled = false;
-                voucherp.grossAmount = requestModel.PaymentAmount;
+                voucherp.grossAmount = paymentSummary.debitAmount;//requestModel.PaymentAmount;
                 voucherp.kdvRate = voucher.kdvRate;
                 voucherp.kdvAmount = voucherp.grossAmount * voucherp.kdvRate;
                 voucherp.netAmount = voucherp.grossAmount - voucherp.kdvAmount;
@@ -80,7 +80,7 @@ namespace Ishop.Core.Finance.Services
                 payment.voucherNo = paymentVoucher.voucherNo;
                 payment.amountType = "C";
                 payment.debitAmount = 0m;
-                payment.creditAmount = requestModel.PaymentAmount; // paymentAmount; // voucher.GrossAmount;
+                payment.creditAmount =  paymentSummary.debitAmount;//requestModel.PaymentAmount; // paymentAmount; // voucher.GrossAmount;
                 payment.paymentVoucherNo = (int)paymentVoucher.paymentVoucherNo;
                 payment.paymentNo = requestModel.PaymentNo; // paymentNo;
                 payment.paymentDate = requestModel.PaymentDate; // paymentDate;
@@ -115,7 +115,7 @@ namespace Ishop.Core.Finance.Services
                     object obj_system_voucher_no = worksheet.Cells[row,SYSTEM_VOUCHER_NO].Value;
                     object obj_payment_no = worksheet.Cells[row,PAYMENT_NO].Value;
                     object obj_payment_date = worksheet.Cells[row,PAYMENT_DATE].Value;
-                    object obj_payment_amount = worksheet.Cells[row,PAYMENT_AMOUNT].Value;
+                    //object obj_payment_amount = worksheet.Cells[row,PAYMENT_AMOUNT].Value;
                     if (Convert.ToString(obj_system_voucher_no).Length==0) {
                         continue;
                     }
@@ -124,15 +124,15 @@ namespace Ishop.Core.Finance.Services
                     decimal paymentAmount = 0;
                     if (int.TryParse(Convert.ToString(obj_system_voucher_no),out voucherNo)) {
                         if (int.TryParse(Convert.ToString(obj_payment_no),out paymentNo)) {
-                            if (decimal.TryParse(Convert.ToString(obj_payment_amount),out paymentAmount)) {
+                          //  if (decimal.TryParse(Convert.ToString(obj_payment_amount),out paymentAmount)) {
                                 DateTime paymentDate = (DateTime)obj_payment_date;
                                 PayVoucherRequestModel payVoucherModel = new PayVoucherRequestModel();
                                 payVoucherModel.SystemVoucherNo = voucherNo;
                                 payVoucherModel.PaymentNo = paymentNo;
                                 payVoucherModel.PaymentDate = paymentDate;
-                                payVoucherModel.PaymentAmount = paymentAmount;
+                                //payVoucherModel.PaymentAmount = paymentAmount;
                                 payVoucherModels.Add(payVoucherModel);
-                            }
+                            //}
                         }
                     }
                 }
