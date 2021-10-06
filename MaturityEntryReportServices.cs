@@ -37,7 +37,8 @@ namespace Ishop.Core.Finance.Services
                             where   paySum.balance > 0 &&
                                     table.rowNo == 0 &&
                                     table.isCancelled != false &&
-                                    table.unitNo == model.unitNo
+                                    table.unitNo == model.unitNo &&
+                                    table.voucherStatus != VoucherStatus.Paid
                             select ( new maturityEntryReportResultModel(){
                                 vergiNo     = firma.vergiNo, 
                                 firmaAdi    = firma.firmaAd,

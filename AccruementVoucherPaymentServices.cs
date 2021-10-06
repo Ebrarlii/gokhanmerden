@@ -73,7 +73,6 @@ namespace Ishop.Core.Finance.Services
                 voucherp.kdvRate = voucher.kdvRate;
                 voucherp.kdvAmount = voucherp.grossAmount * voucherp.kdvRate;
                 voucherp.netAmount = voucherp.grossAmount - voucherp.kdvAmount;
-
                 _financeUnitOfWork.VoucherRepository.Insert(voucherp);
 
                 Payment payment = new Payment();
