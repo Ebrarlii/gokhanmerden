@@ -52,14 +52,15 @@ namespace Ishop.Core.Finance.Services
             List<int> voucherTypes = new List<int>();
             voucherTypes.Add(3);
             voucherTypes.Add(4);
-            voucherTypes.Add(5);
-            voucherTypes.Add(6);
+            voucherTypes.Add(1);
+            //voucherTypes.Add(6);
             List<int> voucherTypesInVoucherTable = new List<int>();
             voucherTypesInVoucherTable.AddRange(voucherTypes);
-            voucherTypesInVoucherTable.Add(7);
-            voucherTypesInVoucherTable.Add(10);
-            voucherTypesInVoucherTable.Add(11);
-            voucherTypesInVoucherTable.Add(16);
+            //voucherTypesInVoucherTable.Add(7);
+            //voucherTypesInVoucherTable.Add(10);
+            //voucherTypesInVoucherTable.Add(11);
+            //voucherTypesInVoucherTable.Add(16);
+
             IQueryable<maturityEntryListModel> result =    from    table in voucherQueryable
                             join paySum in context.PaymentSummary on table.voucherNo equals paySum.voucherNo into paySumInto
                             from paySum in paySumInto.DefaultIfEmpty()
@@ -75,7 +76,8 @@ namespace Ishop.Core.Finance.Services
                                     table.rowNo == 0 &&
                                     firma.id == model.companyId &&
                                     context.getResourceTreeChilds(model.unitNo,1,3,true).Select(p=>p.ITEM_ID).Contains(table.unitNo) &&
-                                    voucherTypesInVoucherTable.Contains(table.voucherType)
+                                    voucherTypesInVoucherTable.Contains(table.voucherType) &&
+                                    table.voucherStatus != VoucherStatus.Paid
                             select( new maturityEntryListModel() { voucherNo = table.voucherNo,
                                          yearNo = table.yearNo, monthNo = table.monthNo,
                                          isCancelled = table.isCancelled,
