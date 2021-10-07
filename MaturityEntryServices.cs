@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -40,11 +41,11 @@ namespace Ishop.Core.Finance.Services
             IQueryable<Voucher> voucherQueryable = (this.GetUow() as Ishop.Core.Finance.Data.FinanceUnitOfWork).VoucherRepository.GetManyQueryable();
             // IQueryable<PaymentSummary> paymentSummaryQueryable = _financeUnitOfWork.PaymentSummaryRepository.GetManyQueryable();
             FinanceDbContext context = (this.GetUow() as Ishop.Core.Finance.Data.FinanceUnitOfWork).GetContext();
-
-            voucherQueryable = voucherQueryable.Where(p=> (p.yearNo >= model.startDate.Year && p.monthNo >= model.startDate.Month) 
+            if (model.startDate > DateTime.MinValue) {
+                voucherQueryable = voucherQueryable.Where(p=> (p.yearNo >= model.startDate.Year && p.monthNo >= model.startDate.Month) 
                                                           ||  (p.yearNo <= model.endDate.Year && p.monthNo <= model.endDate.Month)
                                                           );
-
+            }
             if (model.unitNo > 0 ) {
                 voucherQueryable = voucherQueryable.Where(p=> p.unitNo == model.unitNo);
             }
