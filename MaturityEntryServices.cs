@@ -54,21 +54,12 @@ namespace Ishop.Core.Finance.Services
             voucherTypes.Add(3);
             voucherTypes.Add(4);
             voucherTypes.Add(1);
-            //voucherTypes.Add(6);
             List<int> voucherTypesInVoucherTable = new List<int>();
             voucherTypesInVoucherTable.AddRange(voucherTypes);
-            //voucherTypesInVoucherTable.Add(7);
-            //voucherTypesInVoucherTable.Add(10);
-            //voucherTypesInVoucherTable.Add(11);
-            //voucherTypesInVoucherTable.Add(16);
-/*
-new { voucherNo = table.voucherNo, voucherTypes = voucherTypes.Contains(table.voucherType)}
-                                         equals new { voucherNo = paymentVoucher.voucherNo, voucherTypes = true}
-*/
 
             IQueryable<maturityEntryListModel> query =    from    table in voucherQueryable
-                            //join paySum in context.PaymentSummary on table.voucherNo equals paySum.voucherNo into paySumInto
-                            //from paySum in paySumInto.DefaultIfEmpty()
+                            join paySum in context.PaymentSummary on table.voucherNo equals paySum.voucherNo into paySumInto
+                            from paySum in paySumInto.DefaultIfEmpty()
                             join paymentVoucher in context.PaymentVoucher on 
                                                 table.voucherNo equals paymentVoucher.voucherNo
                                                 into paymentVoucherInto
@@ -79,9 +70,9 @@ new { voucherNo = table.voucherNo, voucherTypes = voucherTypes.Contains(table.vo
                                      select maturity.voucherNo).Contains(table.voucherNo) : true) &&
                                     table.account.debitOrCredit == "C" &&
                                     table.rowNo == 0 &&
-                                    firma.id == model.companyId &&
-                                    model.unitNo > 0 ? context.getResourceTreeChilds(model.unitNo,1,3,true).Select(p=>p.ITEM_ID)
-                                                       .Contains(table.unitNo) : true &&
+                                    (model.companyId > 0 ? firma.id == model.companyId : true) &&
+                                    (model.unitNo > 0 ? context.getResourceTreeChilds(model.unitNo,1,3,true).Select(p=>p.ITEM_ID)
+                                                       .Contains(table.unitNo) : true) &&
                                     voucherTypesInVoucherTable.Contains(table.voucherType) &&
                                     table.voucherStatus != VoucherStatus.Paid
                             select( new maturityEntryListModel() { voucherNo = table.voucherNo,
@@ -89,8 +80,9 @@ new { voucherNo = table.voucherNo, voucherTypes = voucherTypes.Contains(table.vo
                                          isCancelled = table.isCancelled,
                                          grossAmount = table.grossAmount,
                                          dmisFisNo = table.dmisFisNo,dmisNetTutar = table.dmisNetTutar,
-                                         accountName = table.account.accountName,
-                                         firmaAdi = firma.firmaAd } );
+                                         accountName = table.account.accountName
+                                         ,firmaAdi = firma.firmaAd 
+                                         } );
             var pageQuery = query.GroupBy(g => g.voucherNo).Count();
             var page = 1;
             var pageSize = 50;
