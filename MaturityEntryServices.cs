@@ -84,12 +84,11 @@ namespace Ishop.Core.Finance.Services
                                          ,firmaAdi = firma.firmaAd 
                                          } );
             var pageQuery = query.GroupBy(g => g.voucherNo).Count();
-            var page = 1;
             var pageSize = 50;
-            var skip = (page - 1) * pageSize;  
+            var skip = (model.page - 1) * pageSize;  
             var totalCount = pageQuery;
-            var voucherList =  query.OrderBy(o=> o.voucherNo).Skip(0).Take(pageSize).ToList();
-            var paginatedList = new Gokhan.Core.Services.PaginatedList<maturityEntryListModel>(voucherList,totalCount,page,pageSize);
+            var voucherList =  query.OrderBy(o=> o.voucherNo).Skip(skip).Take(pageSize).ToList();
+            var paginatedList = new Gokhan.Core.Services.PaginatedList<maturityEntryListModel>(voucherList,totalCount,model.page,pageSize);
 
             return paginatedList;
         }
