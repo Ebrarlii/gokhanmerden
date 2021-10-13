@@ -46,9 +46,9 @@ namespace Ishop.Core.Finance.Services
                                                           ||  (p.yearNo <= model.endDate.Year && p.monthNo <= model.endDate.Month)
                                                           );
             }
-            if (model.unitNo > 0 ) {
+/*             if (model.unitNo > 0 ) {
                 voucherQueryable = voucherQueryable.Where(p=> p.unitNo == model.unitNo);
-            }
+            } */
 
             List<int> voucherTypes = new List<int>();
             voucherTypes.Add(3);
@@ -61,13 +61,17 @@ namespace Ishop.Core.Finance.Services
             //voucherTypesInVoucherTable.Add(10);
             //voucherTypesInVoucherTable.Add(11);
             //voucherTypesInVoucherTable.Add(16);
+/*
+new { voucherNo = table.voucherNo, voucherTypes = voucherTypes.Contains(table.voucherType)}
+                                         equals new { voucherNo = paymentVoucher.voucherNo, voucherTypes = true}
+*/
 
-            IQueryable<maturityEntryListModel> result =    from    table in voucherQueryable
-                            join paySum in context.PaymentSummary on table.voucherNo equals paySum.voucherNo into paySumInto
-                            from paySum in paySumInto.DefaultIfEmpty()
+            IQueryable<maturityEntryListModel> query =    from    table in voucherQueryable
+                            //join paySum in context.PaymentSummary on table.voucherNo equals paySum.voucherNo into paySumInto
+                            //from paySum in paySumInto.DefaultIfEmpty()
                             join paymentVoucher in context.PaymentVoucher on 
-                                                new { voucherNo = table.voucherNo, voucherTypes = voucherTypes.Contains(table.voucherType)}
-                                         equals new { voucherNo = paymentVoucher.voucherNo, voucherTypes = true} into paymentVoucherInto
+                                                table.voucherNo equals paymentVoucher.voucherNo
+                                                into paymentVoucherInto
                             from paymentVoucher in paymentVoucherInto.DefaultIfEmpty()
                             join firma in context.Company on paymentVoucher.companyNo equals firma.id into firmaInto
                             from firma in firmaInto.DefaultIfEmpty()
@@ -76,7 +80,8 @@ namespace Ishop.Core.Finance.Services
                                     table.account.debitOrCredit == "C" &&
                                     table.rowNo == 0 &&
                                     firma.id == model.companyId &&
-                                    context.getResourceTreeChilds(model.unitNo,1,3,true).Select(p=>p.ITEM_ID).Contains(table.unitNo) &&
+                                    model.unitNo > 0 ? context.getResourceTreeChilds(model.unitNo,1,3,true).Select(p=>p.ITEM_ID)
+                                                       .Contains(table.unitNo) : true &&
                                     voucherTypesInVoucherTable.Contains(table.voucherType) &&
                                     table.voucherStatus != VoucherStatus.Paid
                             select( new maturityEntryListModel() { voucherNo = table.voucherNo,
@@ -86,9 +91,13 @@ namespace Ishop.Core.Finance.Services
                                          dmisFisNo = table.dmisFisNo,dmisNetTutar = table.dmisNetTutar,
                                          accountName = table.account.accountName,
                                          firmaAdi = firma.firmaAd } );
-
-            var voucherList =  await (this.GetUow() as Ishop.Core.Finance.Data.FinanceUnitOfWork).GetQueryableToList(result);
-            var paginatedList = new Gokhan.Core.Services.PaginatedList<maturityEntryListModel>(voucherList,voucherList.Count,1,50);
+            var pageQuery = query.GroupBy(g => g.voucherNo).Count();
+            var page = 1;
+            var pageSize = 50;
+            var skip = (page - 1) * pageSize;  
+            var totalCount = pageQuery;
+            var voucherList =  query.OrderBy(o=> o.voucherNo).Skip(0).Take(pageSize).ToList();
+            var paginatedList = new Gokhan.Core.Services.PaginatedList<maturityEntryListModel>(voucherList,totalCount,page,pageSize);
 
             return paginatedList;
         }
