@@ -46,6 +46,7 @@ namespace Ishop.Core.Finance.Services
                                                           ||  (p.yearNo <= model.endDate.Year && p.monthNo <= model.endDate.Month)
                                                           );
             }
+            
 /*             if (model.unitNo > 0 ) {
                 voucherQueryable = voucherQueryable.Where(p=> p.unitNo == model.unitNo);
             } */
